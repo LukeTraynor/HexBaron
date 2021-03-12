@@ -174,10 +174,11 @@ class HexGrid:
       LumberChange = -LumberCost
       SupplyChange = 1
     elif Items[0] == "downgrade":
-      LumberCost = self.__ExecuteDowngradeCommand(Items, LumberAvailable)
+      LumberCost,FuelCost = self.__ExecuteDowngradeCommand(Items, LumberAvailable)
       if LumberCost < 0:
           return "Downgrade not possible", FuelChange, LumberChange, SupplyChange
-      LumberChange =+ LumberCost
+      LumberChange += LumberCost
+      FuelChange +=FuelCost
     elif Items[0] == "upgrade":
       LumberCost = self.__ExecuteUpgradeCommand(Items, LumberAvailable)
       if LumberCost < 0:
@@ -255,17 +256,23 @@ class HexGrid:
   def __ExecuteDowngradeCommand(self,Items, LumberAvailable):
     TileToUse = int(Items[1])
     if not self.__CheckPieceAndTileAreValid(TileToUse):
-      return -1
+      return -1,0
     else:
       ThePiece = self._Tiles[TileToUse].GetPieceInTile()
-      if ThePiece.GetPieceType().upper() == "S":
-        return -1
+      if ThePiece.GetPieceType().upper() == "S" or ThePiece.GetPieceType().upper() == "B":
+        return -1,0
+      elif ThePiece.GetPieceType().upper() == "P":
+        return 2,3
+      elif ThePiece.GetPieceType().upper() == "L":
+        return 3,2
       ThePiece.DestroyPiece()
       ThePiece = Piece(self._Player1Turn)
       self._Pieces.append(ThePiece)
       self._Tiles[TileToUse].SetPiece(ThePiece)
-      return 5
-
+#      if ThePiece.GetPieceType().upper() == "P":
+#        return 2,3
+#      elif ThePiece.GetPieceType().upper() == "L":
+#        return 3,2
 
   def __ExecuteUpgradeCommand(self, Items, LumberAvailable):
     TileToUse = int(Items[2])
