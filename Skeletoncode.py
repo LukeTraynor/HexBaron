@@ -1,8 +1,3 @@
-#Skeleton Program code for the AQA A Level Paper 1 Summer 2021 examination
-#this code should be used in conjunction with the Preliminary Material
-#written by the AQA Programmer Team
-#developed in the Python 3.5 programming environment
-
 import random
 import os
 
@@ -178,12 +173,18 @@ class HexGrid:
         return "Spawning did not occur", FuelChange, LumberChange, SupplyChange
       LumberChange = -LumberCost
       SupplyChange = 1
+    elif Items[0] == "downgrade":
+      LumberCost,FuelCost = self.__ExecuteDowngradeCommand(Items, LumberAvailable)
+      if LumberCost < 0:
+          return "Downgrade not possible", FuelChange, LumberChange, SupplyChange
+      LumberChange += LumberCost
+      FuelChange +=FuelCost
     elif Items[0] == "upgrade":
       LumberCost = self.__ExecuteUpgradeCommand(Items, LumberAvailable)
       if LumberCost < 0:
         return "Upgrade not possible", FuelChange, LumberChange, SupplyChange
       LumberChange = -LumberCost
-    return "Command executed", FuelChange, LumberChange, SupplyChange
+    return "Command Executed",FuelChange, LumberChange, SupplyChange    
 
   def __CheckTileIndexIsValid(self, TileToCheck):
     return TileToCheck >= 0 and TileToCheck < len(self._Tiles)
@@ -251,6 +252,27 @@ class HexGrid:
     self._Pieces.append(NewPiece)
     self._Tiles[TileToUse].SetPiece(NewPiece)
     return 3
+
+  def __ExecuteDowngradeCommand(self,Items, LumberAvailable):
+    TileToUse = int(Items[1])
+    if not self.__CheckPieceAndTileAreValid(TileToUse):
+      return -1,0
+    else:
+      ThePiece = self._Tiles[TileToUse].GetPieceInTile()
+      if ThePiece.GetPieceType().upper() == "S" or ThePiece.GetPieceType().upper() == "B":
+        return -1,0
+      elif ThePiece.GetPieceType().upper() == "P":
+        return 2,3
+      elif ThePiece.GetPieceType().upper() == "L":
+        return 3,2
+      ThePiece.DestroyPiece()
+      ThePiece = Piece(self._Player1Turn)
+      self._Pieces.append(ThePiece)
+      self._Tiles[TileToUse].SetPiece(ThePiece)
+#      if ThePiece.GetPieceType().upper() == "P":
+#        return 2,3
+#      elif ThePiece.GetPieceType().upper() == "L":
+#        return 3,2
 
   def __ExecuteUpgradeCommand(self, Items, LumberAvailable):
     TileToUse = int(Items[2])
@@ -525,10 +547,11 @@ def CheckCommandIsValid(Items):
   if len(Items) > 0:
     if Items[0] == "move":
       return CheckMoveCommandFormat(Items)
-    elif Items[0] in ["dig", "saw", "spawn"]:
+    elif Items[0] in ["dig", "saw", "spawn","downgrade"]:
       return CheckStandardCommandFormat(Items)
     elif Items[0] == "upgrade":
       return CheckUpgradeCommandFormat(Items)
+    
   return False
 
 def PlayGame(Player1, Player2, Grid):
