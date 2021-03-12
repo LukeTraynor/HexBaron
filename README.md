@@ -1,6 +1,6 @@
 # HexBaron
 
 
-## Never merge into the main branch - this is the original code
+## Merge into the main branch when you know your code works
 
-## create a new branch and name it what you either added or changed
+
