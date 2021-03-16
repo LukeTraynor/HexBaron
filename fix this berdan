@@ -1,3 +1,8 @@
+#Skeleton Program code for the AQA A Level Paper 1 Summer 2021 examination
+#this code should be used in conjunction with the Preliminary Material
+#written by the AQA Programmer Team
+#developed in the Python 3.5 programming environment
+
 import random
 import os
 
@@ -295,7 +300,7 @@ class HexGrid:
         if FromTile.GetDistanceToTileT(ToTile) == 1:
           FromTile.AddToNeighbours(ToTile)
 
-  def DestroyPiecesAndCountVPs(self,Player1, Player2):
+  def DestroyPiecesAndCountVPs(self,Player1,Player2):
     BaronDestroyed = False
     Player1VPs = 0
     Player2VPs = 0
@@ -315,10 +320,10 @@ class HexGrid:
           ListOfTilesContainingDestroyedPieces.append(T)
           if ThePiece.GetBelongsToPlayer1():
             Player2VPs += ThePiece.GetVPs()
-            Player1.AddPiecesInSupply(1)
+            Player2.SetPiecesInSupply(1)
           else:
             Player1VPs += ThePiece.GetVPs()
-            Player2.AddPiecesInSupply(1)
+            Player1.SetPiecesInSupply(1)
     for T in ListOfTilesContainingDestroyedPieces:
       T.SetPiece(None)
     return BaronDestroyed, Player1VPs, Player2VPs
@@ -395,6 +400,10 @@ class Player:
     self._Fuel = F
     self._Lumber = L
     self._PiecesInSupply = T
+  
+ 
+  def SetPiecesInSupply(self,a):
+    SetPiecesInSupply = self._PiecesInSupply + a  
 
   def GetStateString(self):
     return "VPs: " + str(self._VPs) + "   Pieces in supply: " + str(self._PiecesInSupply) + "   Lumber: " + str(self._Lumber) + "   Fuel: " + str(self._Fuel)
@@ -419,9 +428,6 @@ class Player:
 
   def UpdateLumber(self, n):
     self._Lumber += n
-
-  def AddPiecesInSupply(self, n):
-    self._PiecesInSupply += n
 
   def GetPiecesInSupply(self):
     return self._PiecesInSupply
@@ -482,19 +488,17 @@ def SetUpDefaultGame():
   T = [" ", "#", "#", " ", "~", "~", " ", " ", " ", "~", " ", "#", "#", " ", " ", " ", " ", " ", "#", "#", "#", "#", "~", "~", "~", "~", "~", " ", "#", " ", "#", " "]
   GridSize = 8
   Grid = HexGrid(GridSize)
-  playerOneName=input("Enter player one name ")
-  playerTwoName=input("Enter player two name ")
-  Player1 = Player(playerOneName, 0, 10, 10, 5)
-  Player2 = Player(playerTwoName, 1, 10, 10, 5)
+  Player1Name = input("What is your name, Player 1")
+  Player2Name = input("What is your name, Player 2")
+  Player1 = Player(Player1Name, 0, 10, 10, 5)
+  Player2 = Player(Player2Name, 1, 10, 10, 5)
   Grid.SetUpGridTerrain(T)
-
   Grid.AddPiece(True, "Baron", 0)
   Grid.AddPiece(True, "Serf", 7)
   Grid.AddPiece(True, "Serf", 13)
   Grid.AddPiece(False, "Baron", 31)
-  Grid.AddPiece(False, "Serf", 15)
+  Grid.AddPiece(True, "Serf", 15)
   Grid.AddPiece(False, "Serf", 23)
-
   return Player1, Player2, Grid
 
 def CheckMoveCommandFormat(Items):
@@ -537,6 +541,8 @@ def CheckCommandIsValid(Items):
       return CheckUpgradeCommandFormat(Items)
   return False
 
+
+
 def PlayGame(Player1, Player2, Grid):
   GameOver = False
   Player1Turn = True
@@ -550,9 +556,7 @@ def PlayGame(Player1, Player2, Grid):
     else:
       print(Player2.GetName() + " state your three commands, pressing enter after each one.")
     for Count in range (1, 4):
-      Commands.append(input("Enter command: ").lower().strip())
-
-
+      Commands.append((input("Enter command: ").rstrip(" ").lower()))
     for C in Commands:
       Items = C.split(" ")
       ValidCommand = CheckCommandIsValid(Items)
@@ -612,3 +616,4 @@ def DisplayMainMenu():
 
 if __name__ == "__main__":
   Main()
+
