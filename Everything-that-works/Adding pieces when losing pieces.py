@@ -1,6 +1,7 @@
 import random
 import os
 
+
 class Piece:
   def __init__(self, Player1):
     self._FuelCostOfMove = 1
